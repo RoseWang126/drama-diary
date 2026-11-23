@@ -298,7 +298,7 @@ function saveMeta(){ if(!metaRef) return; clearTimeout(metaTimer);
 function handleWriteErr(e){ console.error(e);
   if(e&&e.code==="quota_exceeded") banner("存储空间满了：删掉一些旧记录后才能继续保存。");
   else if(e&&e.code==="invalid_argument") banner("这条没能保存（可能图片太大或没有写入权限）。");
-  else toast("保存失败，请稍后再试"); }
+  else toast("保存失败"+(e&&e.status?"（GitHub "+e.status+"）":"")+"，请再点一次保存"); }
 function allShows(){ const s=[...meta.shows]; for(const r of reactions) if(!s.includes(r.show)) s.push(r.show); return s; }
 
 /* ---------- routing ---------- */
@@ -585,7 +585,7 @@ function editor(r){
     const patch={show:showSel.value,season:Math.max(1,Math.min(99,parseInt(sIn.value)||1)),episode:Math.max(1,Math.min(99,parseInt(eIn.value)||1)),
       ts:tsIn.value.trim().slice(0,10),mood,level,text:ta.value.trim().slice(0,4000),spoiler:sp.checked,createdAt:isNaN(t)?r.createdAt:t};
     save.disabled=true; save.textContent="保存中…";
-    try{ if(assets){ for(const im of added){ const up=await assets.upload(im.blob); ids.push(up.id); } }
+    try{ if(assets){ while(added.length){ const up=await assets.upload(added[0].blob); ids.push(up.id); added.shift(); } }
       patch.imgIds=ids; patch.imgId=null;
       if(reactionsCol) await reactionsCol.doc(r.id).update(patch);
       for(const id of removed){ try{ await assets.delete(id); }catch(e){} }
@@ -784,15 +784,20 @@ function lsGet(){ try{ return JSON.parse(localStorage.getItem(LS)||"null"); }cat
 function lsSet(v){ try{ v?localStorage.setItem(LS,JSON.stringify(v)):localStorage.removeItem(LS); }catch(e){} }
 function guessRepo(){ const h=location.hostname, m=h.match(/^([^.]+)\.github\.io$/i); if(!m) return ""; const seg=location.pathname.split("/").filter(Boolean)[0]; return m[1]+"/"+(seg||h); }
 async function api(path,opt={}){
-  const r=await fetch(`https://api.github.com/repos/${gh.owner}/${gh.repo}${path}`,{...opt,headers:{"Authorization":"Bearer "+gh.token,"Accept":opt.accept||"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",...(opt.body?{"Content-Type":"application/json"}:{})}});
+  const r=await fetch(`https://api.github.com/repos/${gh.owner}/${gh.repo}${path}`,{...opt,cache:"no-store",headers:{"Authorization":"Bearer "+gh.token,"Accept":opt.accept||"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",...(opt.body?{"Content-Type":"application/json"}:{})}});
   if(r.status===404&&opt.allow404) return null;
   if(!r.ok){ const t=await r.text().catch(()=>""); const err=new Error("GitHub "+r.status+" "+t.slice(0,160)); err.status=r.status; throw err; }
   return opt.raw?r.text():r.json();
 }
 const enc=p=>p.split("/").map(encodeURIComponent).join("/");
-async function getSha(p){ const j=await api(`/contents/${enc(p)}?ref=${encodeURIComponent(gh.branch)}`,{allow404:true}); return j&&j.sha||null; }
-async function putFile(p,b64,msg){ const sha=await getSha(p); return api(`/contents/${enc(p)}`,{method:"PUT",body:JSON.stringify({message:msg,content:b64,branch:gh.branch,...(sha?{sha}:{})})}); }
-async function delFile(p,msg){ const sha=await getSha(p); if(!sha) return; return api(`/contents/${enc(p)}`,{method:"DELETE",body:JSON.stringify({message:msg,sha,branch:gh.branch})}); }
+const shaCache={};
+async function getSha(p,fresh){ if(!fresh&&shaCache[p]) return shaCache[p]; const j=await api(`/contents/${enc(p)}?ref=${encodeURIComponent(gh.branch)}&t=${Date.now()}`,{allow404:true}); return shaCache[p]=(j&&j.sha||null); }
+async function putFile(p,b64,msg){
+  const put=sha=>api(`/contents/${enc(p)}`,{method:"PUT",body:JSON.stringify({message:msg,content:b64,branch:gh.branch,...(sha?{sha}:{})})});
+  let j; try{ j=await put(await getSha(p)); }
+  catch(e){ if(e.status!==409&&e.status!==422) throw e; j=await put(await getSha(p,true)); }
+  if(j&&j.content&&j.content.sha) shaCache[p]=j.content.sha; return j; }
+async function delFile(p,msg){ const sha=await getSha(p,true); delete shaCache[p]; if(!sha) return; return api(`/contents/${enc(p)}`,{method:"DELETE",body:JSON.stringify({message:msg,sha,branch:gh.branch})}); }
 function utf8b64(str){ const bytes=new TextEncoder().encode(str); let bin=""; for(let i=0;i<bytes.length;i+=0x8000) bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000)); return btoa(bin); }
 const blobB64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(String(f.result).split(",")[1]);f.readAsDataURL(b);});
 let queue=Promise.resolve(), pending=0;
