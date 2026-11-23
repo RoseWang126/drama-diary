@@ -148,6 +148,35 @@ label.chk{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:1
 .stamp{display:inline-block;font-family:"Gochi Hand",cursive!important;font-weight:400;border:2px dashed var(--accent);color:var(--accent);border-radius:999px;padding:1px 12px 0;font-size:17px;line-height:1.3;transform:rotate(-7deg);letter-spacing:.5px;background:#fff3ef;box-shadow:0 2px 0 rgba(200,70,58,.18);opacity:.5}
 .cover .stamp{position:absolute;top:10px;right:10px;font-size:18px}
 .title .stamp{vertical-align:middle;margin-left:12px;font-size:20px}
+.dash{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:16px}
+.ov{grid-column:span 2;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px}
+.ovtop{display:flex;flex-direction:column;gap:14px}
+.span{display:flex;align-items:center;gap:12px}
+.span .pt small{display:block;color:var(--muted);font-size:11.5px}
+.span .pt b{font-family:"Noto Serif SC",serif;font-size:16px;white-space:nowrap}
+.span .line{flex:1;position:relative;height:2px;background:repeating-linear-gradient(90deg,var(--accent) 0 6px,transparent 6px 11px);margin-top:14px}
+.span .line:before,.span .line:after{content:"";position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.span .line:before{left:-5px}.span .line:after{right:-5px}
+.span .line span{position:absolute;left:50%;top:-26px;transform:translateX(-50%) rotate(-2deg);white-space:nowrap;font-family:"Caveat",cursive;font-size:21px;font-weight:700;color:var(--accent);background:var(--paper);padding:0 6px}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.nums div{background:var(--paper2);border-radius:10px;padding:8px 10px}
+.nums b{display:block;font-family:"Noto Serif SC",serif;font-size:20px;line-height:1.3}
+.nums small{color:var(--muted);font-size:11.5px}
+.ovcurve svg.mini{width:100%;height:auto;display:block;margin-top:4px}
+.stile{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;display:flex;flex-direction:column;transition:transform .15s}
+.stile:hover{transform:translateY(-3px) rotate(-.3deg)}
+.scover{aspect-ratio:16/9;background:var(--paper2);position:relative;overflow:hidden}
+.scover img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.9)}
+.slabel{position:absolute;left:10px;bottom:4px;font-family:"Caveat",cursive;font-weight:700;font-size:38px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.5);line-height:1}
+.scover:not(:has(img)) .slabel{color:#cdbfa9;text-shadow:none}
+.sbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
+.shead{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.shead b{font-size:16px}.shead small,.sdate{color:var(--muted);font-size:12px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.chip{border:0;border-radius:7px;padding:2px 7px;font-size:12px;cursor:pointer;background:var(--c);color:#fff;display:flex;align-items:center;gap:3px;font-family:"Caveat",cursive;font-weight:700;font-size:15px;line-height:1.2}
+.chip i{font-style:normal;font-size:12px}
+.chip:hover{filter:brightness(1.08)}
+@media (max-width:560px){.dash{grid-template-columns:1fr 1fr;gap:10px}.ov{grid-column:1/-1}.nums b{font-size:17px}.slabel{font-size:28px}.sbody{padding:8px 9px 10px}.shead{flex-direction:column;gap:0}.chip{font-size:13px;padding:1px 5px}}
 body:not(.admin) .own{display:none!important}
 .foot{text-align:center;color:var(--muted);font-size:12.5px;margin:40px 0 90px}
 .foot button{background:none;border:0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font:inherit;padding:0}
@@ -285,9 +314,11 @@ function render(){
   if(!ready) return;
   const v=$("view"); v.textContent="";
   if(nav.view==="show" && !reactions.some(r=>r.show===nav.show) && !meta.shows.includes(nav.show)) nav.view="shelf";
+  if(nav.view==="season" && !reactions.some(r=>r.show===nav.show&&r.season===nav.season)) nav.view=reactions.some(r=>r.show===nav.show)?"show":"shelf";
   if(nav.view==="ep" && !reactions.some(r=>r.show===nav.show&&r.season===nav.season&&r.episode===nav.episode)) nav.view=reactions.some(r=>r.show===nav.show)?"show":"shelf";
   if(nav.view==="shelf") v.append(viewShelf());
   else if(nav.view==="show") v.append(viewShow());
+  else if(nav.view==="season") v.append(viewSeason());
   else if(nav.view==="ep") v.append(viewEp());
   else v.append(viewYear());
 }
@@ -358,25 +389,93 @@ function viewShow(){
     !isDone(s)&&meta.current.show!==s?el("button",{class:"btn small own",text:"设为正在看",onclick:()=>{addShow(s,false);toast("已设为正在看");}}):null,
     el("button",{class:"btn small own",text:isDone(s)?"改回在看":"标记为看完 ✓",onclick:()=>setDone(s,!isDone(s))})));
   if(!rs.length) return box;
-  box.append(curve(rs));
-  const seasons=[...new Set(rs.map(r=>r.season))].sort((a,b)=>b-a);
-  for(const se of seasons){
-    const srs=rs.filter(r=>r.season===se);
-    const eps=[...new Set(srs.map(r=>r.episode))].sort((a,b)=>a-b);
-    const sec=el("div",{class:"season"},el("h2",{},document.createTextNode(`第 ${se} 季`),el("small",{text:`${eps.length} 集 · ${srs.length} 条`})));
-    for(const e of eps){
-      const ers=srs.filter(r=>r.episode===e).sort((a,b)=>a.createdAt-b.createdAt);
-      const lv=Math.max(...ers.map(r=>r.level|0));
-      const th=ers.filter(imgSrc).sort((a,b)=>b.level-a.level)[0];
-      sec.append(el("button",{class:"eprow",onclick:()=>go({view:"ep",show:s,season:se,episode:e})},
-        el("span",{class:"num",text:"E"+e}),
-        el("div",{class:"info"},el("div",{class:"emos",text:ers.map(r=>r.mood||"·").join("")}),
-          el("div",{class:"meta",text:`${ers.length} 条 · ${fmtDate(ers[0].createdAt)}`}),
-          el("div",{class:"heatbar"},...[1,2,3,4,5].map(i=>el("i",{class:i<=lv?"on":""})))),
-        th?el("img",{class:"thumb",src:imgSrc(th),alt:"",loading:"lazy"}):null));
+  const dash=el("div",{class:"dash"});
+  dash.append(overview(s,rs));
+  const seasons=[...new Set(rs.map(r=>r.season))].sort((a,b)=>a-b);
+  for(const se of seasons) dash.append(seasonTile(s,se,rs.filter(r=>r.season===se)));
+  box.append(dash);
+  return box;
+}
+const dayDiff=(a,b)=>{ const d=x=>{const t=new Date(x);return Date.UTC(t.getFullYear(),t.getMonth(),t.getDate());}; return Math.round((d(b)-d(a))/864e5)+1; };
+const md=ms=>{const d=new Date(ms);return `${d.getMonth()+1}/${d.getDate()}`;};
+const lvColor=lv=>lv>=5?"#c8463a":lv>=3?"#e0805f":lv>0?"#e8b49a":"#e3d8c7";
+function overview(s,rs){
+  const t0=Math.min(...rs.map(r=>r.createdAt)), t1=Math.max(...rs.map(r=>r.createdAt));
+  const days=dayDiff(t0,t1), done=isDone(s), eps=new Set(rs.map(epCode)).size;
+  const card=el("div",{class:"ov"});
+  card.append(el("div",{class:"ovtop"},
+    el("div",{class:"span"},
+      el("div",{class:"pt"},el("small",{text:"第一天"}),el("b",{text:fmtDate(t0)})),
+      el("div",{class:"line"},el("span",{text:done?`历时 ${days} 天看完`:`已追 ${days} 天`})),
+      el("div",{class:"pt",style:"text-align:right"},el("small",{text:done?"看完那天":"最近一次"}),el("b",{text:fmtDate(t1)}))),
+    el("div",{class:"nums"},
+      el("div",{},el("b",{text:String(eps)}),el("small",{text:"集有记录"})),
+      el("div",{},el("b",{text:String(rs.length)}),el("small",{text:"条 reaction"})),
+      el("div",{},el("b",{text:topMoods(rs,3).join("")||"—"}),el("small",{text:"最常见心情"})))));
+  // compact curve: every season side by side
+  const NS="http://www.w3.org/2000/svg", seasons=[...new Set(rs.map(r=>r.season))].sort((a,b)=>a-b);
+  const groups=seasons.map(se=>({se,max:Math.max(...rs.filter(r=>r.season===se).map(r=>r.episode))}));
+  const total=groups.reduce((a,g)=>a+g.max,0), gap=1.2, H=64, W=600, bw=W/(total+gap*(groups.length-1));
+  const svg=document.createElementNS(NS,"svg"); svg.setAttribute("viewBox",`0 0 ${W} ${H+16}`); svg.setAttribute("class","mini");
+  const add=(t,a,txt)=>{const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);if(txt!=null)n.textContent=txt;svg.append(n);return n;};
+  let x=0;
+  for(const g of groups){
+    const x0=x;
+    for(let e=1;e<=g.max;e++){
+      const er=rs.filter(r=>r.season===g.se&&r.episode===e), lv=er.length?Math.max(...er.map(r=>r.level|0)):0, h=er.length?Math.max(4,lv/5*H):2;
+      const r=add("rect",{x:x+bw*.12,y:H-h,width:bw*.76,height:h,rx:Math.min(3,bw*.2),fill:lvColor(er.length?lv:0)});
+      if(er.length){ r.style.cursor="pointer"; r.addEventListener("click",()=>go({view:"ep",show:s,season:g.se,episode:e}));
+        const tt=document.createElementNS(NS,"title"); tt.textContent=`S${g.se}E${e} · ${er.length} 条`; r.append(tt); }
+      x+=bw;
     }
-    box.append(sec);
+    add("text",{x:(x0+x)/2,y:H+13,"text-anchor":"middle","font-size":11,fill:"#8a7f73"},"S"+g.se);
+    x+=bw*gap;
   }
+  card.append(el("div",{class:"ovcurve"},el("div",{class:"hint",text:"入迷曲线 · 每根柱子是一集，越高越上头，点一下进入那一集"}),svg));
+  return card;
+}
+function seasonTile(s,se,srs){
+  const eps=[...new Set(srs.map(r=>r.episode))].sort((a,b)=>a-b);
+  const t0=Math.min(...srs.map(r=>r.createdAt)), t1=Math.max(...srs.map(r=>r.createdAt));
+  const cov=srs.filter(imgSrc).sort((a,b)=>(b.level-a.level)||(b.createdAt-a.createdAt))[0];
+  const tile=el("div",{class:"stile",role:"button",tabindex:"0",onclick:()=>go({view:"season",show:s,season:se})});
+  tile.addEventListener("keydown",e=>{ if(e.key==="Enter") go({view:"season",show:s,season:se}); });
+  tile.append(el("div",{class:"scover"},cov?el("img",{src:imgSrc(cov),alt:"",loading:"lazy"}):null,el("span",{class:"slabel",text:"S"+se})),
+    el("div",{class:"sbody"},
+      el("div",{class:"shead"},el("b",{class:"serif",text:`第 ${se} 季`}),el("small",{text:`${eps.length} 集 · ${srs.length} 条`})),
+      el("div",{class:"sdate",text:t0===t1||md(t0)===md(t1)?fmtDate(t0):`${fmtDate(t0)} – ${md(t1)} · ${dayDiff(t0,t1)} 天`}),
+      el("div",{class:"chips"},...eps.map(e=>{ const er=srs.filter(r=>r.episode===e), lv=Math.max(...er.map(r=>r.level|0));
+        return el("button",{class:"chip",title:`E${e} · ${er.length} 条`,style:`--c:${lvColor(lv)}`,onclick:ev=>{ev.stopPropagation();go({view:"ep",show:s,season:se,episode:e});}},
+          el("span",{text:"E"+e}),el("i",{text:er.map(r=>r.mood).filter(Boolean).slice(0,1).join("")})); }))));
+  return tile;
+}
+function viewSeason(){
+  const {show:s,season:se}=nav, rs=reactions.filter(r=>r.show===s&&r.season===se);
+  const box=el("div");
+  box.append(el("div",{class:"crumbs"},el("button",{text:"书架",onclick:()=>go({view:"shelf"})}),el("span",{text:"/"}),
+    el("button",{text:s,onclick:()=>go({view:"show",show:s})}),el("span",{text:"/"}),el("span",{text:`第 ${se} 季`})));
+  const ss=[...new Set(reactions.filter(r=>r.show===s).map(r=>r.season))].sort((a,b)=>a-b), k=ss.indexOf(se), prev=ss[k-1], next=ss[k+1];
+  epNav={prev:prev!=null?["S",prev]:null,next:next!=null?["S",next]:null,show:s,season:true};
+  box.append(el("div",{class:"pager"},
+    el("button",{disabled:prev!=null?null:"",onclick:()=>prev!=null&&go({view:"season",show:s,season:prev})},document.createTextNode("‹"),el("small",{text:"上一季"}),el("b",{text:prev!=null?"S"+prev:""})),
+    el("button",{disabled:next!=null?null:"",onclick:()=>next!=null&&go({view:"season",show:s,season:next})},el("b",{text:next!=null?"S"+next:""}),el("small",{text:"下一季"}),document.createTextNode("›"))));
+  const t0=Math.min(...rs.map(r=>r.createdAt)), t1=Math.max(...rs.map(r=>r.createdAt));
+  box.append(el("h2",{class:"title"},document.createTextNode(s+" "),el("span",{class:"hand",style:"color:var(--accent);font-size:34px",text:"S"+se})),
+    el("div",{class:"sub",text:`${fmtDate(t0)} – ${fmtDate(t1)} · ${dayDiff(t0,t1)} 天 · ${new Set(rs.map(r=>r.episode)).size} 集 · ${rs.length} 条`}),
+    el("div",{class:"row"},el("button",{class:"btn small own",text:"＋ 在这一季记一笔",onclick:()=>openComposer({show:s,season:se})})));
+  const sec=el("div",{class:"season"});
+  for(const e of [...new Set(rs.map(r=>r.episode))].sort((a,b)=>a-b)){
+    const ers=rs.filter(r=>r.episode===e).sort((a,b)=>a.createdAt-b.createdAt);
+    const lv=Math.max(...ers.map(r=>r.level|0));
+    const th=ers.filter(imgSrc).sort((a,b)=>b.level-a.level)[0];
+    sec.append(el("button",{class:"eprow",onclick:()=>go({view:"ep",show:s,season:se,episode:e})},
+      el("span",{class:"num",text:"E"+e}),
+      el("div",{class:"info"},el("div",{class:"emos",text:ers.map(r=>r.mood||"·").join("")}),
+        el("div",{class:"meta",text:`${ers.length} 条 · ${fmtDate(ers[0].createdAt)}`}),
+        el("div",{class:"heatbar"},...[1,2,3,4,5].map(i=>el("i",{class:i<=lv?"on":""})))),
+      th?el("img",{class:"thumb",src:imgSrc(th),alt:"",loading:"lazy"}):null));
+  }
+  box.append(sec);
   return box;
 }
 function curve(rs){
@@ -402,18 +501,19 @@ function curve(rs){
 let epNav=null;
 function epList(s){ const m=new Map(); for(const r of reactions) if(r.show===s) m.set(r.season*1000+r.episode,[r.season,r.episode]); return [...m.entries()].sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
 document.addEventListener("keydown",e=>{
-  if(nav.view!=="ep"||!epNav||editingId) return;
+  if((nav.view!=="ep"&&nav.view!=="season")||!epNav||editingId) return;
   const t=e.target; if(t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"||t.tagName==="SELECT"||t.isContentEditable)) return;
   if($("composer").classList.contains("on")||$("imgModal").classList.contains("on")) return;
   const to=e.key==="ArrowLeft"?epNav.prev:e.key==="ArrowRight"?epNav.next:null;
-  if(to){ e.preventDefault(); go({view:"ep",show:epNav.show,season:to[0],episode:to[1]}); }
+  if(to){ e.preventDefault(); if(epNav.season) go({view:"season",show:epNav.show,season:to[1]}); else go({view:"ep",show:epNav.show,season:to[0],episode:to[1]}); }
 });
 function viewEp(){
   const {show:s,season:se,episode:e}=nav;
   const rs=reactions.filter(r=>r.show===s&&r.season===se&&r.episode===e).sort((a,b)=>a.createdAt-b.createdAt);
   const box=el("div");
   box.append(el("div",{class:"crumbs"},el("button",{text:"书架",onclick:()=>go({view:"shelf"})}),el("span",{text:"/"}),
-    el("button",{text:s,onclick:()=>go({view:"show",show:s})}),el("span",{text:"/"}),el("span",{text:`S${se}E${e}`})));
+    el("button",{text:s,onclick:()=>go({view:"show",show:s})}),el("span",{text:"/"}),
+    el("button",{text:`第 ${se} 季`,onclick:()=>go({view:"season",show:s,season:se})}),el("span",{text:"/"}),el("span",{text:`E${e}`})));
   const eps=epList(s), idx=eps.findIndex(x=>x[0]===se&&x[1]===e);
   const prev=idx>0?eps[idx-1]:null, next=idx>=0&&idx<eps.length-1?eps[idx+1]:null;
   const pager=()=>el("div",{class:"pager"},
@@ -639,7 +739,7 @@ const drop=$("drop");
 ["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over");}));
 drop.addEventListener("drop",async e=>{ for(const f of [...e.dataTransfer.files]) await setImage(f); });
 document.addEventListener("paste",e=>{ if(!isAdmin) return; const items=e.clipboardData&&e.clipboardData.items; if(!items) return;
-  for(const it of items){ if(it.type.startsWith("image/")){ e.preventDefault(); if(!$("composer").classList.contains("on")) openComposer(nav.view==="ep"?{show:nav.show,season:nav.season,episode:nav.episode}:nav.view==="show"?{show:nav.show}:null); setImage(it.getAsFile()); toast("截图已贴上"); return; } } });
+  for(const it of items){ if(it.type.startsWith("image/")){ e.preventDefault(); if(!$("composer").classList.contains("on")) openComposer(nav.view==="ep"?{show:nav.show,season:nav.season,episode:nav.episode}:nav.view==="season"?{show:nav.show,season:nav.season}:nav.view==="show"?{show:nav.show}:null); setImage(it.getAsFile()); toast("截图已贴上"); return; } } });
 
 let saving=false;
 async function save(){
