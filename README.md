@@ -1,6 +1,6 @@
 # 追剧现场 · reaction diary
 
-我的追剧 reaction 手账：看到上头的瞬间截图、吐槽、记心情。
+我的追剧 reaction 手账
 
 - `index.html`：网站本体
 - `data/reactions.json`：全部 reaction 记录
