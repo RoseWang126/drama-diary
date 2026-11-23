@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>追剧现场 · Reaction Diary</title>
+<meta name="description" content="我的追剧 reaction 手账">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=Noto+Sans+SC:wght@400;500;700&family=Caveat:wght@500;700&family=Gochi+Hand&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#efe8dc; --paper:#fffcf6; --paper2:#f7f1e6; --line:#e3d8c7; --ink:#2b2622; --muted:#8a7f73;
+  --accent:#c8463a; --accent-soft:#f6ddd6; --gold:#d9a441; --tape:rgba(240,210,120,.55);
+  --r:14px; --shadow:0 1px 2px rgba(60,40,20,.06),0 6px 18px rgba(60,40,20,.07);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans SC",system-ui,sans-serif;font-size:15px;line-height:1.6}
+body{background-image:radial-gradient(rgba(120,90,50,.06) 1px,transparent 1px);background-size:18px 18px}
+button,input,textarea,select{font:inherit;color:inherit}
+.wrap{max-width:900px;margin:0 auto;padding:22px 16px 110px}
+.serif{font-family:"Noto Serif SC",serif}
+.hand{font-family:"Caveat",cursive}
+/* header */
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+h1{font-family:"Noto Serif SC",serif;font-weight:900;font-size:32px;margin:0;letter-spacing:2px}
+h1 small{font-family:"Caveat",cursive;font-weight:700;font-size:22px;color:var(--accent);letter-spacing:0;margin-left:6px}
+.tabs{display:flex;gap:4px;background:var(--paper2);border:1px solid var(--line);border-radius:999px;padding:3px}
+.tabs a{padding:5px 14px;border-radius:999px;text-decoration:none;color:var(--muted);font-size:14px}
+.tabs a.on{background:var(--paper);color:var(--ink);box-shadow:var(--shadow)}
+.nowbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;margin-bottom:18px;box-shadow:var(--shadow);font-size:14px}
+.nowbar .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(200,70,58,.5)}70%{box-shadow:0 0 0 8px rgba(200,70,58,0)}100%{box-shadow:0 0 0 0 rgba(200,70,58,0)}}
+.nowbar b{font-family:"Noto Serif SC",serif}
+.nowbar .code{font-family:"Caveat",cursive;font-size:20px;color:var(--accent);font-weight:700}
+.spacer{flex:1}
+.banner{background:#fbe9e4;border:1px solid #efc2b8;color:#8a2e23;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;display:none}
+.btn{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:7px 13px;cursor:pointer}
+.btn:hover{border-color:#cbbba3}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.small{padding:4px 10px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+.crumbs{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:14px;margin-bottom:12px;flex-wrap:wrap}
+.crumbs button{background:none;border:0;padding:0;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.crumbs button:hover{color:var(--ink)}
+.title{font-family:"Noto Serif SC",serif;font-weight:900;font-size:28px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13px}
+.empty{text-align:center;color:var(--muted);padding:50px 10px}
+.loading{color:var(--muted);text-align:center;padding:30px}
+/* shelf */
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px}
+.showcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s;text-align:left;padding:0;display:flex;flex-direction:column}
+.showcard:hover{transform:translateY(-3px) rotate(-.4deg)}
+.cover{aspect-ratio:16/10;background:var(--paper2);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover .initial{font-family:"Noto Serif SC",serif;font-weight:900;font-size:46px;color:#cdbfa9}
+.showcard .body{padding:12px 14px 14px}
+.showcard h3{margin:0;font-family:"Noto Serif SC",serif;font-size:18px}
+.showcard .meta{color:var(--muted);font-size:12.5px;margin-top:2px}
+.showcard .emos{margin-top:6px;font-size:17px;letter-spacing:2px}
+.addcard{border:1.5px dashed #cdbfa9;border-radius:var(--r);background:transparent;color:var(--muted);cursor:pointer;min-height:180px;font-size:15px}
+.addcard:hover{color:var(--ink);border-color:var(--muted)}
+/* show view */
+.curve{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin:14px 0 6px;box-shadow:var(--shadow)}
+.curve svg{width:100%;height:auto;display:block}
+.season{margin-top:22px}
+.season h2{font-family:"Noto Serif SC",serif;font-size:17px;margin:0 0 10px;display:flex;align-items:baseline;gap:8px}
+.season h2 small{color:var(--muted);font-family:"Noto Sans SC";font-weight:400;font-size:13px}
+.eprow{display:flex;align-items:center;gap:14px;width:100%;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:8px;cursor:pointer;text-align:left;box-shadow:var(--shadow)}
+.eprow:hover{border-color:#cbbba3}
+.eprow .num{font-family:"Caveat",cursive;font-weight:700;font-size:30px;color:var(--accent);min-width:54px;line-height:1}
+.eprow .info{flex:1;min-width:0}
+.eprow .emos{font-size:17px;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eprow .meta{color:var(--muted);font-size:12.5px}
+.eprow .thumb{width:76px;height:46px;border-radius:6px;object-fit:cover;flex:none}
+.heatbar{display:flex;gap:2px;margin-top:3px}
+.heatbar i{width:14px;height:5px;border-radius:3px;background:var(--line)}
+.heatbar i.on{background:var(--accent)}
+/* episode timeline */
+.timeline{position:relative;margin-top:18px;padding-left:76px}
+.timeline:before{content:"";position:absolute;left:62px;top:6px;bottom:6px;border-left:2px dotted #cdbfa9}
+.entry{position:relative;margin-bottom:22px}
+.entry .when{position:absolute;left:-80px;top:2px;width:52px;text-align:right;font-family:"Caveat",cursive;font-size:21px;font-weight:700;line-height:1.1;color:var(--muted)}
+.entry .when small{display:block;font-family:"Noto Sans SC";font-size:10.5px;font-weight:400}
+.entry:before{content:"";position:absolute;left:-19px;top:9px;width:10px;height:10px;border-radius:50%;background:var(--paper);border:2px solid var(--accent)}
+.note{background:var(--paper);border:1px solid var(--line);border-radius:4px 14px 14px 14px;padding:12px 14px;box-shadow:var(--shadow)}
+.note .top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.note .emo{font-size:24px;line-height:1}
+.note .ts{background:var(--paper2);border:1px solid var(--line);padding:0 7px;border-radius:6px;color:var(--ink);font-family:"Caveat",cursive;font-size:17px;font-weight:700}
+.note .txt{margin:8px 0 0;white-space:pre-wrap;word-break:break-word;font-family:"Noto Serif SC",serif;font-size:16px}
+.polaroid{display:inline-block;background:#fff;padding:8px 8px 10px;margin-top:12px;box-shadow:0 2px 8px rgba(60,40,20,.15);transform:rotate(-1deg);position:relative;max-width:100%}
+.polaroid:before{content:"";position:absolute;top:-9px;left:50%;width:70px;height:20px;margin-left:-35px;background:var(--tape);transform:rotate(-3deg)}
+.polaroid img{display:block;max-width:100%;max-height:380px;cursor:zoom-in}
+.note.spoiler .txt,.note.spoiler .polaroid img{filter:blur(14px);cursor:pointer}
+.pics{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.pics.multi .polaroid{max-width:calc(50% - 8px)}
+.pics.multi .polaroid:nth-child(even){transform:rotate(1.2deg)}
+.pics.multi .polaroid img{max-height:260px}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.thumbs .t{position:relative}
+.thumbs .t img{height:90px;border-radius:6px;display:block}
+.thumbs .t .x{position:absolute;top:3px;right:3px;background:#0008;border:0;border-radius:50%;width:22px;height:22px;cursor:pointer;color:#fff;font-size:13px;line-height:1}
+.thumbs .add{height:90px;min-width:70px;border:1.5px dashed #cdbfa9;border-radius:6px;background:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0 10px}
+@media (max-width:560px){.pics.multi .polaroid{max-width:100%}}
+.note .acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.note .acts button{background:none;border:1px solid var(--line);border-radius:8px;padding:2px 9px;font-size:12px;color:var(--muted);cursor:pointer}
+.note .acts button:hover{color:var(--ink)}
+/* form bits */
+select,input[type=text],input[type=datetime-local]{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:7px 10px;outline:none}
+select:focus,input:focus,textarea:focus{border-color:var(--accent)}
+textarea{width:100%;min-height:90px;resize:vertical;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px;outline:none;font-family:"Noto Serif SC",serif;font-size:15.5px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.hint{color:var(--muted);font-size:12.5px}
+.moods{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.mood{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px 11px;cursor:pointer;font-size:14px}
+.mood.on{border-color:var(--accent);background:var(--accent-soft)}
+.heat{display:flex;gap:1px}
+.heat button{background:none;border:0;cursor:pointer;font-size:18px;padding:0 1px;filter:grayscale(1) opacity(.3)}
+.heat button.on{filter:none}
+.stepper{display:flex;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stepper span{padding:0 2px 0 10px;color:var(--muted);font-size:13px}
+.stepper b{min-width:24px;text-align:center;font-family:"Caveat",cursive;font-size:20px}
+.stepper button{background:none;border:0;padding:6px 10px;cursor:pointer;color:var(--muted)}
+.drop{border:1.5px dashed #cdbfa9;border-radius:12px;padding:12px;text-align:center;color:var(--muted);font-size:13px;cursor:pointer;margin-top:10px;position:relative;background:var(--paper)}
+.drop.over{border-color:var(--accent);color:var(--ink)}
+.drop img{max-height:150px;max-width:100%;border-radius:6px;display:block;margin:0 auto}
+.drop .x{position:absolute;top:6px;right:8px;background:#0008;border:0;border-radius:50%;width:24px;height:24px;cursor:pointer;color:#fff}
+label.chk{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:13px;cursor:pointer}
+/* sheet */
+.overlay{position:fixed;inset:0;background:rgba(40,30,20,.45);display:none;align-items:flex-end;justify-content:center;z-index:20;padding:0}
+.overlay.on{display:flex}
+.sheet{background:var(--paper2);width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:18px 18px 22px;box-shadow:0 -10px 30px rgba(0,0,0,.15)}
+@media(min-width:700px){.overlay{align-items:center}.sheet{border-radius:20px}}
+.sheet h3{margin:0 0 10px;font-family:"Noto Serif SC",serif}
+.fab{position:fixed;right:22px;bottom:22px;z-index:10;background:var(--accent);color:#fff;border:0;border-radius:999px;padding:13px 20px;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 8px 22px rgba(200,70,58,.35)}
+.fab:hover{filter:brightness(1.07)}
+.modal{position:fixed;inset:0;background:rgba(20,15,10,.8);display:none;align-items:center;justify-content:center;z-index:30;padding:20px}
+.modal.on{display:flex}
+.modal img{max-width:100%;max-height:100%;border-radius:6px}
+.dialog{background:var(--paper);border-radius:var(--r);padding:20px;max-width:340px;width:100%}
+.dialog p{margin:0 0 14px}
+.pager{display:flex;justify-content:space-between;gap:10px;margin:14px 0 4px}
+.pager button{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 14px;cursor:pointer;box-shadow:var(--shadow);display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink)}
+.pager button:hover{border-color:#cbbba3}
+.pager button b{font-family:"Caveat",cursive;font-size:21px;color:var(--accent);font-weight:700}
+.pager button small{color:var(--muted);font-size:12px}
+.pager button:disabled{visibility:hidden}
+.stamp{display:inline-block;font-family:"Gochi Hand",cursive!important;font-weight:400;border:2px dashed var(--accent);color:var(--accent);border-radius:999px;padding:1px 12px 0;font-size:17px;line-height:1.3;transform:rotate(-7deg);letter-spacing:.5px;background:#fff3ef;box-shadow:0 2px 0 rgba(200,70,58,.18);opacity:.5}
+.cover .stamp{position:absolute;top:10px;right:10px;font-size:18px}
+.title .stamp{vertical-align:middle;margin-left:12px;font-size:20px}
+body:not(.admin) .own{display:none!important}
+.foot{text-align:center;color:var(--muted);font-size:12.5px;margin:40px 0 90px}
+.foot button{background:none;border:0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font:inherit;padding:0}
+.dialog input[type=text],.dialog input[type=password]{box-sizing:border-box}
+.saving{position:fixed;left:16px;bottom:16px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12px;color:var(--muted);box-shadow:var(--shadow);z-index:15;display:none}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:8px 16px;border-radius:999px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:40}
+.toast.on{opacity:1;transform:translateX(-50%)}
+/* year */
+.yearhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.yearhead select{font-family:"Noto Serif SC",serif;font-weight:900;font-size:22px;padding:2px 8px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:16px 0}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;box-shadow:var(--shadow)}
+.stat b{display:block;font-family:"Noto Serif SC",serif;font-size:24px;line-height:1.2}
+.stat small{color:var(--muted);font-size:12px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.panel h3{margin:0 0 10px;font-family:"Noto Serif SC",serif;font-size:16px}
+.hmwrap{overflow-x:auto;padding-bottom:4px}
+.hm{display:grid;grid-template-rows:14px repeat(7,13px);grid-auto-flow:column;grid-auto-columns:13px;gap:3px;width:max-content}
+.hm .m{font-size:10px;color:var(--muted);white-space:nowrap;grid-row:1}
+.hm .d{border-radius:3px;background:#ebe2d3;cursor:pointer;border:0;padding:0}
+.hm .d.l1{background:#f5cdbb}.hm .d.l2{background:#ec9a7c}.hm .d.l3{background:#d9614a}.hm .d.l4{background:#a8352a}
+.hm .d.sel{outline:2px solid var(--ink);outline-offset:1px}
+.hm .d.out{visibility:hidden}
+.legend{display:flex;gap:4px;align-items:center;font-size:11px;color:var(--muted);margin-top:8px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.daydetail{margin-top:12px;font-size:14px;min-height:20px}
+.daydetail button{background:none;border:0;padding:0;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px;font:inherit}
+.bars .b{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}
+.bars .b span:first-child{width:76px}
+.bars .b .track{flex:1;background:var(--paper2);border-radius:4px;height:10px;overflow:hidden}
+.bars .b .fill{height:100%;background:var(--accent);border-radius:4px}
+.bars .b em{font-style:normal;color:var(--muted);width:30px;text-align:right}
+.highlights{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:18px;margin-top:6px}
+.hl{background:#fff;padding:8px 8px 10px;box-shadow:0 2px 8px rgba(60,40,20,.15);cursor:pointer;border:0;text-align:left}
+.hl:nth-child(odd){transform:rotate(-1.2deg)}.hl:nth-child(even){transform:rotate(1deg)}
+.hl img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+.hl p{margin:6px 2px 0;font-size:12.5px;font-family:"Noto Serif SC",serif;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.hl small{display:block;color:var(--muted);font-size:11px;margin:2px 2px 0}
+@media (max-width:560px){h1{font-size:27px}.timeline{padding-left:62px}.timeline:before{left:50px}.entry .when{left:-62px;width:46px;font-size:18px}.entry:before{left:-17px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>追剧现场<small>reaction diary</small></h1>
+    <nav class="tabs"><a href="#shelf" id="tabShelf" class="on">书架</a><a href="#year" id="tabYear">年度回顾</a></nav>
+  </header>
+  <div class="banner" id="banner"></div>
+  <div class="nowbar" id="nowbar"></div>
+  <main id="view"><div class="loading">正在翻开手账…</div></main>
+</div>
+<button class="fab own" id="fab">＋ 记一笔</button>
+<footer class="foot"><span id="footText">追剧现场 · 我的追剧手账</span> · <button id="loginBtn">管理</button></footer>
+<div class="modal" id="loginModal"><div class="dialog" style="max-width:420px">
+  <h3 class="serif" style="margin:0 0 6px">用 GitHub 登录管理</h3>
+  <p class="hint" style="margin:0 0 12px">粘贴你为这个仓库生成的 GitHub 令牌（fine-grained token，只给这个仓库的 Contents 读写权限）。令牌只保存在这台设备的浏览器里。</p>
+  <label class="hint">仓库（用户名/仓库名）</label>
+  <input type="text" id="repoIn" style="width:100%;margin:4px 0 10px" placeholder="yourname/drama-diary">
+  <label class="hint">令牌</label>
+  <input type="password" id="tokenIn" style="width:100%;margin:4px 0 6px" placeholder="github_pat_…" autocomplete="off">
+  <p class="hint" id="loginErr" style="color:var(--accent);min-height:18px;margin:4px 0"></p>
+  <div class="row" style="justify-content:flex-end"><button class="btn" id="loginCancel">取消</button><button class="btn primary" id="loginOk">登录</button></div>
+</div></div>
+
+<div class="overlay" id="composer"><div class="sheet">
+  <h3>记一笔</h3>
+  <div class="row" style="margin-top:0">
+    <select id="cShow"></select>
+    <div class="stepper"><span>S</span><button data-k="season" data-d="-1">−</button><b id="cS">1</b><button data-k="season" data-d="1">+</button></div>
+    <div class="stepper"><span>E</span><button data-k="episode" data-d="-1">−</button><b id="cE">1</b><button data-k="episode" data-d="1">+</button></div>
+  </div>
+  <div class="row" id="newShowRow" style="display:none"><input type="text" id="newShow" placeholder="新剧名" maxlength="40"><button class="btn small" id="newShowOk">添加</button></div>
+  <div class="moods" id="cMoods"></div>
+  <textarea id="cTxt" placeholder="此刻的心情……（Ctrl/⌘ + Enter 保存，截图可直接粘贴）"></textarea>
+  <div class="drop" id="drop">点击、拖入或 Ctrl/⌘+V 粘贴截图</div>
+  <input type="file" id="file" accept="image/*" multiple hidden>
+  <div class="row"><span class="hint">上头程度</span><div class="heat" id="cHeat"></div>
+    <input type="text" id="cTs" placeholder="剧中时间 32:15" style="width:120px" maxlength="10">
+    <label class="chk"><input type="checkbox" id="cSpoiler"> 剧透打码</label></div>
+  <div class="row"><label class="chk"><input type="checkbox" id="cBack"> 补录旧记录</label><input type="datetime-local" id="cWhen" style="display:none">
+    <div class="spacer"></div><button class="btn" id="cCancel">取消</button><button class="btn primary" id="cSave">记下来</button></div>
+</div></div>
+
+<div class="modal" id="imgModal"><img id="imgBig" alt=""></div>
+<div class="modal" id="confirmModal"><div class="dialog"><p id="confirmText"></p><div class="row" style="justify-content:flex-end"><button class="btn" id="cNo">取消</button><button class="btn primary" id="cYes">删除</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const MOODS=[["😱","震惊"],["🤣","笑死"],["😭","破防"],["🤯","烧脑"],["😍","心动"],["😤","气死"],["🥶","吓人"],["🫠","上头"],["🤔","细思"],["👏","名场面"]];
+const MOOD_NAME=Object.fromEntries(MOODS);
+const SUGGEST=["怪奇物语","Hacks","白莲花度假村"];
+const $=id=>document.getElementById(id);
+function el(tag,attrs,...kids){const e=document.createElement(tag);if(attrs)for(const k in attrs){const v=attrs[k];if(v==null)continue;if(k==="class")e.className=v;else if(k==="text")e.textContent=v;else if(k.startsWith("on"))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v);}for(const c of kids){if(c==null||c===false)continue;e.append(c);}return e;}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("on"),1800);}
+function banner(m){const b=$("banner");if(!m){b.style.display="none";return;}b.textContent=m;b.style.display="block";}
+const pad=n=>String(n).padStart(2,"0");
+const dayKey=ms=>{const d=new Date(ms);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;};
+const fmtDate=ms=>{const d=new Date(ms);return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;};
+const fmtHM=ms=>{const d=new Date(ms);return `${pad(d.getHours())}:${pad(d.getMinutes())}`;};
+const epCode=r=>`S${r.season}E${r.episode}`;
+const blobCache={};
+const imgUrl=id=>blobCache[id]||("images/"+encodeURIComponent(id)+".jpg");
+function imgSrcs(r){ const out=(r.imgIds||[]).map(imgUrl); if(typeof r.imgData==="string"&&r.imgData.startsWith("data:image/")) out.push(r.imgData); return out; }
+function imgSrc(r){ return imgSrcs(r)[0]||null; }
+function topMoods(list,n){const c={};for(const r of list) if(r.mood) c[r.mood]=(c[r.mood]||0)+1;return Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,n).map(x=>x[0]);}
+
+/* ---------- state ---------- */
+let assets=null, reactionsCol=null, metaRef=null, ready=false;
+let meta={shows:[],done:[],current:{show:"",season:1,episode:1}};
+const isDone=s=>meta.done.includes(s);
+function setDone(s,v){ meta.done=meta.done.filter(x=>x!==s); if(v) meta.done.push(s); saveMeta(); render(); toast(v?`《${s}》已标记为看完 🎉`:`《${s}》恢复为在看`); }
+let reactions=[];
+let nav={view:"shelf",show:null,season:null,episode:null};
+let editingId=null, selDay=null, year=new Date().getFullYear();
+
+/* ---------- writes ---------- */
+let metaChain=Promise.resolve(), metaTimer=null;
+function saveMeta(){ if(!metaRef) return; clearTimeout(metaTimer);
+  metaTimer=setTimeout(()=>{ const body=JSON.parse(JSON.stringify(meta)); metaChain=metaChain.then(()=>metaRef.set(body)).catch(handleWriteErr); },500); }
+function handleWriteErr(e){ console.error(e);
+  if(e&&e.code==="quota_exceeded") banner("存储空间满了：删掉一些旧记录后才能继续保存。");
+  else if(e&&e.code==="invalid_argument") banner("这条没能保存（可能图片太大或没有写入权限）。");
+  else toast("保存失败，请稍后再试"); }
+function allShows(){ const s=[...meta.shows]; for(const r of reactions) if(!s.includes(r.show)) s.push(r.show); return s; }
+
+/* ---------- routing ---------- */
+function go(v){ Object.assign(nav,v); editingId=null; if(nav.view==="year"){ if(location.hash!=="#year") location.hash="year"; } else if(location.hash==="#year"){ history.replaceState(null,"","#shelf"); } render(); window.scrollTo({top:0}); }
+window.addEventListener("hashchange",()=>{ if(location.hash==="#year"){ nav.view="year"; } else if(nav.view==="year"){ nav.view="shelf"; } render(); });
+if(location.hash==="#year") nav.view="year";
+
+/* ---------- render ---------- */
+function render(){
+  $("tabShelf").classList.toggle("on",nav.view!=="year"); $("tabYear").classList.toggle("on",nav.view==="year");
+  renderNow();
+  if(!ready) return;
+  const v=$("view"); v.textContent="";
+  if(nav.view==="show" && !reactions.some(r=>r.show===nav.show) && !meta.shows.includes(nav.show)) nav.view="shelf";
+  if(nav.view==="ep" && !reactions.some(r=>r.show===nav.show&&r.season===nav.season&&r.episode===nav.episode)) nav.view=reactions.some(r=>r.show===nav.show)?"show":"shelf";
+  if(nav.view==="shelf") v.append(viewShelf());
+  else if(nav.view==="show") v.append(viewShow());
+  else if(nav.view==="ep") v.append(viewEp());
+  else v.append(viewYear());
+}
+function renderNow(){
+  const b=$("nowbar"); b.textContent="";
+  const c=meta.current;
+  if(c.show&&isDone(c.show)){ b.append(el("span",{class:"hint",text:"上一部"}),el("b",{text:c.show}),el("span",{class:"stamp",text:"Finished! ♡",title:"已看完"}),
+      el("div",{class:"spacer"}),
+      el("button",{class:"btn small",text:"打开这部剧",onclick:()=>go({view:"show",show:c.show})}),
+      el("button",{class:"btn small primary own",text:"开始追下一部",onclick:()=>{openComposer();$("newShowRow").style.display="flex";$("newShow").focus();}})); }
+  else if(c.show){ b.append(el("i",{class:"dot"}),el("span",{class:"hint",text:"正在看"}),el("b",{text:c.show}),el("span",{class:"code",text:`S${c.season}E${c.episode}`}),
+      el("div",{class:"spacer"}),
+      el("button",{class:"btn small own",text:"下一集 ▸",onclick:()=>{c.episode=Math.min(99,c.episode+1);saveMeta();renderNow();toast(`进入 S${c.season}E${c.episode}`);}}),
+      el("button",{class:"btn small own",text:"看完了 ✓",title:"把这部剧标记为看完",onclick:()=>setDone(c.show,true)}),
+      el("button",{class:"btn small",text:"打开这部剧",onclick:()=>go({view:"show",show:c.show})})); }
+  else b.append(el("span",{class:"hint",text:"还没开始追剧。点右下角「＋ 记一笔」，或者先在书架上添加一部剧。"}));
+}
+
+/* shelf */
+function viewShelf(){
+  const box=el("div");
+  const shows=allShows();
+  if(!shows.length){
+    box.append(el("div",{class:"empty"},el("p",{class:"serif",style:"font-size:18px;margin:0 0 10px",text:"手账还是空白的"}),
+      el("p",{text:"看到上头的瞬间，截图粘贴进来就是第一页。"}),
+      el("div",{class:"row",style:"justify-content:center"},...SUGGEST.map(s=>el("button",{class:"btn small own",text:"＋ "+s,onclick:()=>addShow(s,true)})))));
+    return box;
+  }
+  const grid=el("div",{class:"shelf"});
+  const lastOf=s=>Math.max(0,...reactions.filter(r=>r.show===s).map(r=>r.createdAt));
+  shows.sort((a,b)=>lastOf(b)-lastOf(a));
+  for(const s of shows){
+    const rs=reactions.filter(r=>r.show===s);
+    const eps=new Set(rs.map(epCode)).size;
+    const withImg=rs.filter(imgSrc).sort((a,b)=>(b.level-a.level)||(b.createdAt-a.createdAt));
+    const cover=el("div",{class:"cover"}, withImg[0]?el("img",{src:imgSrc(withImg[0]),alt:"",loading:"lazy"}):el("span",{class:"initial",text:s.slice(0,1)}));
+    if(isDone(s)) cover.append(el("span",{class:"stamp",text:"Finished! ♡",title:"已看完"}));
+    grid.append(el("button",{class:"showcard",onclick:()=>go({view:"show",show:s})},cover,
+      el("div",{class:"body"},el("h3",{text:s}),
+        el("div",{class:"meta",text:rs.length?`${eps} 集 · ${rs.length} 条 · 最近 ${fmtDate(lastOf(s))}`:"还没有记录"}),
+        el("div",{class:"emos",text:topMoods(rs,4).join("")||" "}))));
+  }
+  grid.append(el("button",{class:"addcard own",text:"＋ 添加一部剧",onclick:()=>{const n=promptRow(box);}}));
+  box.append(grid);
+  return box;
+}
+function promptRow(box){
+  if(box.querySelector(".newshow")) return;
+  const inp=el("input",{type:"text",placeholder:"剧名，比如：怪奇物语",maxlength:"40"});
+  const ok=()=>{ if(inp.value.trim()) addShow(inp.value,true); };
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")ok();});
+  box.prepend(el("div",{class:"row newshow",style:"margin:0 0 14px"},inp,el("button",{class:"btn small primary",text:"添加",onclick:ok}),el("button",{class:"btn small",text:"取消",onclick:e=>e.target.closest(".newshow").remove()})));
+  inp.focus();
+}
+function addShow(name,open){ name=(name||"").trim().slice(0,40); if(!name) return;
+  if(!meta.shows.includes(name)) meta.shows.push(name);
+  const last=reactions.find(r=>r.show===name);
+  meta.current={show:name,season:last?last.season:1,episode:last?last.episode:1}; saveMeta();
+  if(open) go({view:"show",show:name}); else render(); }
+
+/* show */
+function viewShow(){
+  const s=nav.show, rs=reactions.filter(r=>r.show===s);
+  const box=el("div");
+  box.append(el("div",{class:"crumbs"},el("button",{text:"书架",onclick:()=>go({view:"shelf"})}),el("span",{text:"/"}),el("span",{text:s})));
+  box.append(el("h2",{class:"title"},document.createTextNode(s),isDone(s)?el("span",{class:"stamp",text:"Finished! ♡",title:"已看完"}):null),el("div",{class:"sub",text:rs.length?`${new Set(rs.map(epCode)).size} 集 · ${rs.length} 条 reaction · ${fmtDate(Math.min(...rs.map(r=>r.createdAt)))} 起`:"还没有记录，点「＋ 记一笔」开始。"}));
+  box.append(el("div",{class:"row"},el("button",{class:"btn small own",text:"＋ 在这部剧记一笔",onclick:()=>openComposer({show:s})}),
+    !isDone(s)&&meta.current.show!==s?el("button",{class:"btn small own",text:"设为正在看",onclick:()=>{addShow(s,false);toast("已设为正在看");}}):null,
+    el("button",{class:"btn small own",text:isDone(s)?"改回在看":"标记为看完 ✓",onclick:()=>setDone(s,!isDone(s))})));
+  if(!rs.length) return box;
+  box.append(curve(rs));
+  const seasons=[...new Set(rs.map(r=>r.season))].sort((a,b)=>b-a);
+  for(const se of seasons){
+    const srs=rs.filter(r=>r.season===se);
+    const eps=[...new Set(srs.map(r=>r.episode))].sort((a,b)=>a-b);
+    const sec=el("div",{class:"season"},el("h2",{},document.createTextNode(`第 ${se} 季`),el("small",{text:`${eps.length} 集 · ${srs.length} 条`})));
+    for(const e of eps){
+      const ers=srs.filter(r=>r.episode===e).sort((a,b)=>a.createdAt-b.createdAt);
+      const lv=Math.max(...ers.map(r=>r.level|0));
+      const th=ers.filter(imgSrc).sort((a,b)=>b.level-a.level)[0];
+      sec.append(el("button",{class:"eprow",onclick:()=>go({view:"ep",show:s,season:se,episode:e})},
+        el("span",{class:"num",text:"E"+e}),
+        el("div",{class:"info"},el("div",{class:"emos",text:ers.map(r=>r.mood||"·").join("")}),
+          el("div",{class:"meta",text:`${ers.length} 条 · ${fmtDate(ers[0].createdAt)}`}),
+          el("div",{class:"heatbar"},...[1,2,3,4,5].map(i=>el("i",{class:i<=lv?"on":""})))),
+        th?el("img",{class:"thumb",src:imgSrc(th),alt:"",loading:"lazy"}):null));
+    }
+    box.append(sec);
+  }
+  return box;
+}
+function curve(rs){
+  const box=el("div",{class:"curve"},el("div",{class:"serif",style:"font-weight:600",text:"入迷曲线"}),el("div",{class:"hint",text:"柱高 = 这一集最高上头程度 · 数字 = reaction 条数"}));
+  const NS="http://www.w3.org/2000/svg";
+  for(const se of [...new Set(rs.map(r=>r.season))].sort((a,b)=>a-b)){
+    const eps=rs.filter(r=>r.season===se); const maxE=Math.max(...eps.map(r=>r.episode));
+    const W=Math.max(720,maxE*60),H=96,bw=W/maxE;
+    const svg=document.createElementNS(NS,"svg"); svg.setAttribute("viewBox",`0 0 ${W} ${H+20}`);
+    const add=(t,a,txt)=>{const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);if(txt!=null)n.textContent=txt;svg.append(n);};
+    for(let e=1;e<=maxE;e++){
+      const g=eps.filter(r=>r.episode===e),x=(e-1)*bw,lv=g.length?Math.max(...g.map(r=>r.level|0)):0,h=lv/5*(H-20);
+      add("rect",{x:x+bw*.2,y:H-h,width:bw*.6,height:Math.max(h,g.length?3:1),rx:3,fill:g.length?(lv>=5?"#c8463a":lv>=3?"#e0805f":"#e8b49a"):"#e3d8c7"});
+      if(g.length) add("text",{x:x+bw/2,y:H-h-5,"text-anchor":"middle","font-size":11,fill:"#2b2622"},String(g.length));
+      add("text",{x:x+bw/2,y:H+15,"text-anchor":"middle","font-size":11,fill:"#8a7f73"},"E"+e);
+    }
+    box.append(el("div",{class:"hint",style:"margin-top:8px",text:`第 ${se} 季`}),svg);
+  }
+  return box;
+}
+
+/* episode */
+let epNav=null;
+function epList(s){ const m=new Map(); for(const r of reactions) if(r.show===s) m.set(r.season*1000+r.episode,[r.season,r.episode]); return [...m.entries()].sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
+document.addEventListener("keydown",e=>{
+  if(nav.view!=="ep"||!epNav||editingId) return;
+  const t=e.target; if(t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"||t.tagName==="SELECT"||t.isContentEditable)) return;
+  if($("composer").classList.contains("on")||$("imgModal").classList.contains("on")) return;
+  const to=e.key==="ArrowLeft"?epNav.prev:e.key==="ArrowRight"?epNav.next:null;
+  if(to){ e.preventDefault(); go({view:"ep",show:epNav.show,season:to[0],episode:to[1]}); }
+});
+function viewEp(){
+  const {show:s,season:se,episode:e}=nav;
+  const rs=reactions.filter(r=>r.show===s&&r.season===se&&r.episode===e).sort((a,b)=>a.createdAt-b.createdAt);
+  const box=el("div");
+  box.append(el("div",{class:"crumbs"},el("button",{text:"书架",onclick:()=>go({view:"shelf"})}),el("span",{text:"/"}),
+    el("button",{text:s,onclick:()=>go({view:"show",show:s})}),el("span",{text:"/"}),el("span",{text:`S${se}E${e}`})));
+  const eps=epList(s), idx=eps.findIndex(x=>x[0]===se&&x[1]===e);
+  const prev=idx>0?eps[idx-1]:null, next=idx>=0&&idx<eps.length-1?eps[idx+1]:null;
+  const pager=()=>el("div",{class:"pager"},
+    el("button",{disabled:prev?null:"",onclick:()=>prev&&go({view:"ep",show:s,season:prev[0],episode:prev[1]})},document.createTextNode("‹"),el("small",{text:"上一集"}),el("b",{text:prev?`S${prev[0]}E${prev[1]}`:""})),
+    el("button",{disabled:next?null:"",onclick:()=>next&&go({view:"ep",show:s,season:next[0],episode:next[1]})},el("b",{text:next?`S${next[0]}E${next[1]}`:""}),el("small",{text:"下一集"}),document.createTextNode("›")));
+  epNav={prev,next,show:s};
+  box.append(pager());
+  const first=rs[0],last=rs[rs.length-1];
+  box.append(el("h2",{class:"title"},document.createTextNode(s+" "),el("span",{class:"hand",style:"color:var(--accent);font-size:34px",text:`S${se}E${e}`})),
+    el("div",{class:"sub",text:`${fmtDate(first.createdAt)} ${fmtHM(first.createdAt)} – ${fmtHM(last.createdAt)} · ${rs.length} 条 · ${topMoods(rs,3).join(" ")}`}),
+    el("div",{class:"row"},el("button",{class:"btn small own",text:"＋ 在这一集记一笔",onclick:()=>openComposer({show:s,season:se,episode:e})}),
+      el("button",{class:"btn small",text:"复制这一集给朋友",onclick:()=>copy(rs.map(shareText).join("\n"),"整集已复制")})));
+  const tl=el("div",{class:"timeline"});
+  let lastDay=null;
+  for(const r of rs){
+    const dk=dayKey(r.createdAt);
+    const ent=el("div",{class:"entry"},el("div",{class:"when"},document.createTextNode(fmtHM(r.createdAt)),dk!==lastDay?el("small",{text:fmtDate(r.createdAt)}):null));
+    lastDay=dk;
+    ent.append(editingId===r.id?editor(r):note(r));
+    tl.append(ent);
+  }
+  box.append(tl);
+  if(rs.length>2) box.append(pager());
+  return box;
+}
+function shareText(r){ return `【${r.show} ${epCode(r)}${r.ts?" "+r.ts:""}】${r.mood||""} ${r.text||""}`.trim(); }
+async function copy(t,msg){ try{ await navigator.clipboard.writeText(t); toast(msg||"已复制"); }catch(e){ toast("复制失败，长按文字手动复制"); } }
+function note(r){
+  const n=el("div",{class:"note"+(r.spoiler?" spoiler":"")});
+  n.append(el("div",{class:"top"},r.mood?el("span",{class:"emo",text:r.mood}):null,r.mood?el("span",{text:MOOD_NAME[r.mood]||""}):null,
+    r.ts?el("span",{class:"ts",text:r.ts}):null,el("span",{text:"🔥".repeat(Math.max(0,Math.min(5,r.level|0)))})));
+  if(r.text){ const t=el("p",{class:"txt",text:r.text}); t.onclick=()=>n.classList.remove("spoiler"); n.append(t); }
+  const srcs=imgSrcs(r);
+  if(srcs.length){ const pics=el("div",{class:"pics"+(srcs.length>1?" multi":"")});
+    for(const src of srcs){ const im=el("img",{src,alt:"截图",loading:"lazy"});
+      im.onclick=()=>{ if(n.classList.contains("spoiler")){n.classList.remove("spoiler");return;} $("imgBig").src=src; $("imgModal").classList.add("on"); };
+      pics.append(el("div",{class:"polaroid"},im)); }
+    n.append(pics); }
+  n.append(el("div",{class:"acts"},
+    el("button",{text:"复制发朋友",onclick:()=>copy(shareText(r))}),
+    el("button",{class:"own",text:"编辑",onclick:()=>{editingId=r.id;render();}}),
+    el("button",{class:"own",text:"删除",onclick:()=>askDelete(r)})));
+  return n;
+}
+function editor(r){
+  const box=el("div",{class:"note"});
+  const showSel=el("select"); for(const s of new Set([...allShows(),r.show])) showSel.append(el("option",{value:s,text:s})); showSel.value=r.show;
+  const num=v=>{const i=el("input",{type:"text",inputmode:"numeric",style:"width:52px"});i.value=v;return i;};
+  const sIn=num(r.season),eIn=num(r.episode);
+  const tsIn=el("input",{type:"text",placeholder:"剧中时间",style:"width:110px",maxlength:"10"}); tsIn.value=r.ts||"";
+  let mood=r.mood,level=r.level||3;
+  const moods=el("div",{class:"moods"}),heat=el("div",{class:"heat"});
+  const dm=()=>{moods.textContent="";for(const [e,nm] of MOODS) moods.append(el("button",{class:"mood"+(mood===e?" on":""),text:`${e} ${nm}`,onclick:()=>{mood=mood===e?"":e;dm();}}));};
+  const dh=()=>{heat.textContent="";for(let i=1;i<=5;i++) heat.append(el("button",{class:i<=level?"on":"",text:"🔥",onclick:()=>{level=i;dh();}}));};
+  dm();dh();
+  const ta=el("textarea"); ta.value=r.text||"";
+  const sp=el("input",{type:"checkbox"}); sp.checked=!!r.spoiler;
+  const when=el("input",{type:"datetime-local"}); when.value=new Date(r.createdAt-new Date(r.createdAt).getTimezoneOffset()*60000).toISOString().slice(0,16);
+  let ids=[...(r.imgIds||[])]; const added=[]; const removed=[];
+  const pics=el("div",{class:"thumbs",style:"justify-content:flex-start;margin-top:10px"});
+  const picker=el("input",{type:"file",accept:"image/*",multiple:"",hidden:""});
+  const dp=()=>{ pics.textContent="";
+    ids.forEach((id,k)=>pics.append(el("div",{class:"t"},el("img",{src:imgUrl(id),alt:""}),el("button",{class:"x",text:"×",title:"移除这张",onclick:()=>{removed.push(id);ids.splice(k,1);dp();}}))));
+    added.forEach((im,k)=>pics.append(el("div",{class:"t"},el("img",{src:im.url,alt:""}),el("button",{class:"x",text:"×",onclick:()=>{URL.revokeObjectURL(im.url);added.splice(k,1);dp();}}))));
+    if(assets&&ids.length+added.length<6) pics.append(el("button",{class:"add",text:"＋ 加图",onclick:()=>picker.click()})); };
+  picker.onchange=async()=>{ for(const f of [...picker.files]){ if(ids.length+added.length>=6) break; try{ const b=await compress(f,1600,0.82); added.push({blob:b,url:URL.createObjectURL(b)}); }catch(e){} } picker.value=""; dp(); };
+  dp();
+  const save=el("button",{class:"btn primary small",text:"保存修改"});
+  save.onclick=async()=>{ const t=new Date(when.value).getTime();
+    const patch={show:showSel.value,season:Math.max(1,Math.min(99,parseInt(sIn.value)||1)),episode:Math.max(1,Math.min(99,parseInt(eIn.value)||1)),
+      ts:tsIn.value.trim().slice(0,10),mood,level,text:ta.value.trim().slice(0,4000),spoiler:sp.checked,createdAt:isNaN(t)?r.createdAt:t};
+    save.disabled=true; save.textContent="保存中…";
+    try{ if(assets){ for(const im of added){ const up=await assets.upload(im.blob); ids.push(up.id); } }
+      patch.imgIds=ids; patch.imgId=null;
+      if(reactionsCol) await reactionsCol.doc(r.id).update(patch);
+      for(const id of removed){ try{ await assets.delete(id); }catch(e){} }
+      editingId=null; if(patch.show!==nav.show||patch.season!==nav.season||patch.episode!==nav.episode) Object.assign(nav,{view:"ep",show:patch.show,season:patch.season,episode:patch.episode});
+      render(); toast("已更新 ✓"); }
+    catch(e){ handleWriteErr(e); save.disabled=false; save.textContent="保存修改"; } };
+  box.append(el("div",{class:"row",style:"margin-top:0"},showSel,el("span",{class:"hint",text:"S"}),sIn,el("span",{class:"hint",text:"E"}),eIn,tsIn),
+    moods,ta,pics,picker,el("div",{class:"row"},el("span",{class:"hint",text:"上头程度"}),heat,el("label",{class:"chk"},sp,document.createTextNode(" 剧透打码"))),
+    el("div",{class:"row"},el("span",{class:"hint",text:"记录时间"}),when,el("div",{class:"spacer"}),
+      el("button",{class:"btn small",text:"取消",onclick:()=>{editingId=null;render();}}),save));
+  return box;
+}
+
+/* year */
+function viewYear(){
+  const box=el("div");
+  const years=[...new Set(reactions.map(r=>new Date(r.createdAt).getFullYear()))].sort((a,b)=>b-a);
+  if(!years.includes(year)) years.unshift(year);
+  const ys=el("select"); for(const y of [...new Set(years)].sort((a,b)=>b-a)) ys.append(el("option",{value:y,text:y+" 年"})); ys.value=year;
+  ys.onchange=()=>{year=+ys.value;selDay=null;render();};
+  box.append(el("div",{class:"yearhead"},ys,el("span",{class:"sub",text:"我的追剧年度回顾"})));
+  const rs=reactions.filter(r=>new Date(r.createdAt).getFullYear()===year);
+  if(!rs.length){ box.append(el("div",{class:"empty",text:"这一年还没有记录。"})); return box; }
+  // aggregates
+  const byDay={}; for(const r of rs){ const k=dayKey(r.createdAt); (byDay[k]=byDay[k]||[]).push(r); }
+  const byEp={}; for(const r of rs){ const k=r.show+"|"+epCode(r); (byEp[k]=byEp[k]||[]).push(r); }
+  const showCnt={}; for(const r of rs) showCnt[r.show]=(showCnt[r.show]||0)+1;
+  const topShow=Object.entries(showCnt).sort((a,b)=>b[1]-a[1])[0];
+  const score=list=>list.reduce((a,r)=>a+(r.level|0),0);
+  const topDay=Object.entries(byDay).sort((a,b)=>score(b[1])-score(a[1]))[0];
+  const topEp=Object.entries(byEp).sort((a,b)=>score(b[1])-score(a[1]))[0];
+  const tm=topMoods(rs,1)[0];
+  box.append(el("div",{class:"cards"},
+    stat(rs.length,"条 reaction"),stat(Object.keys(byDay).length,"天在追剧"),stat(Object.keys(showCnt).length,"部剧 · "+Object.keys(byEp).length+" 集"),
+    stat(tm?`${tm} ${MOOD_NAME[tm]||""}`:"—","最常见的心情"),
+    statBtn(topShow[0],`最上头的剧 · ${topShow[1]} 条`,()=>go({view:"show",show:topShow[0]})),
+    statBtn(topEp[0].replace("|"," "),`最上头的一集 · ${topEp[1].length} 条`,()=>{const r=topEp[1][0];go({view:"ep",show:r.show,season:r.season,episode:r.episode});}),
+    statBtn(fmtDate(topDay[1][0].createdAt),`最上头的一天 · ${topDay[1].length} 条`,()=>{selDay=topDay[0];render();})));
+  // heatmap
+  const hp=el("div",{class:"panel"},el("h3",{text:"心情热力图"}));
+  const hm=el("div",{class:"hm"});
+  const start=new Date(year,0,1), off=(start.getDay()+6)%7; // Monday first
+  const end=new Date(year,11,31);
+  const totalDays=Math.round((end-start)/864e5)+1, cols=Math.ceil((off+totalDays)/7);
+  const lvOf=list=>{ if(!list) return 0; const s=score(list); return s>=25?4:s>=12?3:s>=5?2:1; };
+  for(let c=0;c<cols;c++){
+    // month label row
+    const firstIdx=c*7-off; let label="";
+    for(let i=0;i<7;i++){ const di=firstIdx+i; if(di<0||di>=totalDays) continue; const d=new Date(year,0,1+di); if(d.getDate()===1){ label=(d.getMonth()+1)+"月"; break; } if(c===0&&!label) label="1月"; }
+    hm.append(el("span",{class:"m",text:label}));
+    for(let i=0;i<7;i++){
+      const di=c*7+i-off;
+      if(di<0||di>=totalDays){ hm.append(el("span",{class:"d out"})); continue; }
+      const d=new Date(year,0,1+di), k=dayKey(d.getTime()), list=byDay[k], lv=lvOf(list);
+      const moods=list?topMoods(list,3).join(""):"";
+      hm.append(el("button",{class:`d${lv?" l"+lv:""}${selDay===k?" sel":""}`,title:`${d.getMonth()+1}月${d.getDate()}日 · ${list?list.length+" 条 "+moods:"没有记录"}`,
+        onclick:()=>{selDay=selDay===k?null:k;render();}}));
+    }
+  }
+  hp.append(el("div",{class:"hmwrap"},hm),
+    el("div",{class:"legend"},document.createTextNode("平静 "),el("i",{style:"background:#ebe2d3"}),el("i",{style:"background:#f5cdbb"}),el("i",{style:"background:#ec9a7c"}),el("i",{style:"background:#d9614a"}),el("i",{style:"background:#a8352a"}),document.createTextNode(" 超上头（按当天🔥总数）")));
+  const dd=el("div",{class:"daydetail"});
+  if(selDay&&byDay[selDay]){
+    const list=byDay[selDay].sort((a,b)=>a.createdAt-b.createdAt);
+    const [y,m,dn]=selDay.split("-");
+    dd.append(el("b",{class:"serif",text:`${+m}月${+dn}日`}),document.createTextNode(` · ${list.length} 条 ${topMoods(list,5).join("")} · `));
+    const eps=[...new Set(list.map(r=>r.show+"|"+r.season+"|"+r.episode))];
+    eps.forEach((k,i)=>{ const [s,se,e]=k.split("|"); if(i) dd.append(document.createTextNode("、"));
+      dd.append(el("button",{text:`${s} S${se}E${e}`,onclick:()=>go({view:"ep",show:s,season:+se,episode:+e})})); });
+  } else if(selDay){ dd.append(el("span",{class:"hint",text:"这一天没有记录。"})); }
+  else dd.append(el("span",{class:"hint",text:"点格子看那天追了什么。"}));
+  hp.append(dd); box.append(hp);
+  // mood bars
+  const mc={}; for(const r of rs) if(r.mood) mc[r.mood]=(mc[r.mood]||0)+1;
+  const mx=Math.max(1,...Object.values(mc));
+  const mp=el("div",{class:"panel"},el("h3",{text:"心情分布"}));
+  const bars=el("div",{class:"bars"});
+  for(const [e,c] of Object.entries(mc).sort((a,b)=>b[1]-a[1]))
+    bars.append(el("div",{class:"b"},el("span",{text:`${e} ${MOOD_NAME[e]||""}`}),el("div",{class:"track"},el("div",{class:"fill",style:`width:${(c/mx*100).toFixed(1)}%`})),el("em",{text:String(c)})));
+  mp.append(bars); box.append(mp);
+  // highlights
+  const hl=rs.filter(imgSrc).sort((a,b)=>(b.level-a.level)||(b.createdAt-a.createdAt)).slice(0,8);
+  if(hl.length){
+    const hp2=el("div",{class:"panel"},el("h3",{text:"高光时刻"}));
+    const g=el("div",{class:"highlights"});
+    for(const r of hl) g.append(el("button",{class:"hl",onclick:()=>go({view:"ep",show:r.show,season:r.season,episode:r.episode})},
+      el("img",{src:imgSrc(r),alt:"",loading:"lazy"}),el("p",{text:`${r.mood||""} ${r.spoiler?"（剧透已隐藏）":r.text||""}`}),el("small",{text:`${r.show} ${epCode(r)} · ${fmtDate(r.createdAt)}`})));
+    hp2.append(g); box.append(hp2);
+  }
+  return box;
+}
+function stat(v,l){ return el("div",{class:"stat"},el("b",{text:String(v)}),el("small",{text:l})); }
+function statBtn(v,l,fn){ const s=stat(v,l); s.style.cursor="pointer"; s.onclick=fn; return s; }
+
+/* ---------- composer ---------- */
+let draft={show:"",season:1,episode:1,mood:"",level:3,imgs:[]};
+function openComposer(pre){
+  const c=meta.current;
+  const last=pre&&pre.show?reactions.find(r=>r.show===pre.show):null;
+  draft.show=(pre&&pre.show)||c.show||allShows()[0]||"";
+  draft.season=(pre&&pre.season)||(draft.show===c.show?c.season:(last?last.season:1));
+  draft.episode=(pre&&pre.episode)||(draft.show===c.show?c.episode:(last?last.episode:1));
+  fillShowSel(); drawC(); $("composer").classList.add("on"); setTimeout(()=>$("cTxt").focus(),50);
+}
+function closeComposer(){ $("composer").classList.remove("on"); }
+function fillShowSel(){ const s=$("cShow"); s.textContent="";
+  const shows=allShows(); if(!shows.length) s.append(el("option",{value:"",text:"— 先添加一部剧 —"}));
+  for(const x of shows) s.append(el("option",{value:x,text:x}));
+  s.append(el("option",{value:"__add",text:"＋ 添加新剧…"})); s.value=draft.show||""; }
+function drawC(){
+  $("cS").textContent=draft.season; $("cE").textContent=draft.episode;
+  const m=$("cMoods"); m.textContent="";
+  for(const [e,n] of MOODS) m.append(el("button",{class:"mood"+(draft.mood===e?" on":""),text:`${e} ${n}`,onclick:()=>{draft.mood=draft.mood===e?"":e;drawC();}}));
+  const h=$("cHeat"); h.textContent="";
+  for(let i=1;i<=5;i++) h.append(el("button",{class:i<=draft.level?"on":"",text:"🔥",onclick:()=>{draft.level=i;drawC();}}));
+  const d=$("drop"); d.textContent="";
+  if(draft.imgs.length){ const th=el("div",{class:"thumbs"});
+    draft.imgs.forEach((im,k)=>th.append(el("div",{class:"t"},el("img",{src:im.url,alt:"截图预览"}),el("button",{class:"x",text:"×",onclick:ev=>{ev.stopPropagation();URL.revokeObjectURL(im.url);draft.imgs.splice(k,1);drawC();}}))));
+    if(draft.imgs.length<6) th.append(el("button",{class:"add",text:"＋ 再加一张",onclick:ev=>{ev.stopPropagation();$("file").click();}}));
+    d.append(th); }
+  else d.textContent="点击、拖入或 Ctrl/⌘+V 粘贴截图（一条最多 6 张）";
+}
+$("cShow").onchange=e=>{ if(e.target.value==="__add"){ $("newShowRow").style.display="flex"; $("newShow").focus(); e.target.value=draft.show; return; }
+  draft.show=e.target.value; const last=reactions.find(r=>r.show===draft.show);
+  if(draft.show===meta.current.show){draft.season=meta.current.season;draft.episode=meta.current.episode;} else {draft.season=last?last.season:1;draft.episode=last?last.episode:1;} drawC(); };
+const addNew=()=>{ const n=$("newShow").value.trim().slice(0,40); if(!n) return; if(!meta.shows.includes(n)){meta.shows.push(n);saveMeta();} draft.show=n; draft.season=1; draft.episode=1; $("newShow").value=""; $("newShowRow").style.display="none"; fillShowSel(); drawC(); };
+$("newShowOk").onclick=addNew; $("newShow").addEventListener("keydown",e=>{if(e.key==="Enter")addNew();});
+document.querySelectorAll("#composer .stepper button").forEach(b=>b.onclick=()=>{ const k=b.dataset.k; draft[k]=Math.max(1,Math.min(99,draft[k]+(+b.dataset.d))); drawC(); });
+$("cCancel").onclick=closeComposer;
+$("composer").addEventListener("click",e=>{ if(e.target===$("composer")) closeComposer(); });
+$("fab").onclick=()=>openComposer();
+$("cBack").onchange=e=>{ const w=$("cWhen"); w.style.display=e.target.checked?"":"none"; if(e.target.checked&&!w.value) w.value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16); };
+$("cTxt").addEventListener("keydown",e=>{ if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){e.preventDefault();save();} });
+$("cSave").onclick=save;
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeComposer(); $("imgModal").classList.remove("on"); } });
+
+function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});}
+async function compress(blob,maxSide,q){ const u=URL.createObjectURL(blob);
+  try{ const img=await loadImg(u); const s=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+    const c=document.createElement("canvas"); c.width=Math.round(img.naturalWidth*s); c.height=Math.round(img.naturalHeight*s);
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height); return await new Promise(r=>c.toBlob(r,"image/jpeg",q)); } finally{ URL.revokeObjectURL(u); } }
+function blobToDataURL(b){return new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b);});}
+async function setImage(file){ if(!file||!file.type.startsWith("image/")) return;
+  if(draft.imgs.length>=6){ toast("一条最多 6 张"); return; }
+  try{ const blob=await compress(file,1600,0.82); draft.imgs.push({blob,url:URL.createObjectURL(blob)}); drawC(); }catch(e){ toast("这张图读不了"); } }
+$("drop").onclick=()=>{ if(!draft.imgs.length) $("file").click(); };
+$("file").onchange=async e=>{ for(const f of [...e.target.files]) await setImage(f); e.target.value=""; };
+const drop=$("drop");
+["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over");}));
+drop.addEventListener("drop",async e=>{ for(const f of [...e.dataTransfer.files]) await setImage(f); });
+document.addEventListener("paste",e=>{ if(!isAdmin) return; const items=e.clipboardData&&e.clipboardData.items; if(!items) return;
+  for(const it of items){ if(it.type.startsWith("image/")){ e.preventDefault(); if(!$("composer").classList.contains("on")) openComposer(nav.view==="ep"?{show:nav.show,season:nav.season,episode:nav.episode}:nav.view==="show"?{show:nav.show}:null); setImage(it.getAsFile()); toast("截图已贴上"); return; } } });
+
+let saving=false;
+async function save(){
+  if(saving) return;
+  const text=$("cTxt").value.trim();
+  if(!draft.show){ toast("先选一部剧"); return; }
+  if(!text&&!draft.imgs.length&&!draft.mood){ toast("写点什么，或者贴张截图"); return; }
+  saving=true; $("cSave").disabled=true; $("cSave").textContent="保存中…";
+  try{
+    let createdAt=Date.now();
+    if($("cBack").checked&&$("cWhen").value){ const t=new Date($("cWhen").value).getTime(); if(!isNaN(t)) createdAt=t; }
+    const rec={show:draft.show,season:draft.season,episode:draft.episode,ts:$("cTs").value.trim().slice(0,10),mood:draft.mood,level:draft.level,
+      text:text.slice(0,4000),spoiler:$("cSpoiler").checked,createdAt};
+    if(draft.imgs.length){
+      if(assets){ rec.imgIds=[]; for(const im of draft.imgs){ const up=await assets.upload(im.blob); rec.imgIds.push(up.id); } }
+      else { let b=draft.imgs[0].blob; if(b.size>170000) b=await compress(b,1000,0.7); if(b.size>200000) b=await compress(b,720,0.6); rec.imgData=await blobToDataURL(b); }
+    }
+    if(reactionsCol) await reactionsCol.add(rec); else { reactions.unshift({id:"m"+Date.now(),...rec}); }
+    if(!meta.shows.includes(draft.show)) meta.shows.push(draft.show);
+    meta.current={show:draft.show,season:draft.season,episode:draft.episode}; saveMeta();
+    $("cTxt").value=""; $("cTs").value=""; $("cSpoiler").checked=false; $("cBack").checked=false; $("cWhen").style.display="none";
+    for(const im of draft.imgs) URL.revokeObjectURL(im.url); draft.imgs=[];
+    draft.mood=""; draft.level=3; closeComposer();
+    nav={view:"ep",show:rec.show,season:rec.season,episode:rec.episode}; if(location.hash==="#year") history.replaceState(null,"","#shelf");
+    render(); toast("记下了 ✓");
+  }catch(e){ handleWriteErr(e); }
+  finally{ saving=false; $("cSave").disabled=false; $("cSave").textContent="记下来"; }
+}
+
+/* modals */
+$("imgModal").onclick=()=>$("imgModal").classList.remove("on");
+let pendingDel=null;
+function askDelete(r){ pendingDel=r; $("confirmText").textContent=`删除这条 ${r.show} ${epCode(r)} 的记录？删了就找不回来了。`; $("confirmModal").classList.add("on"); }
+$("cNo").onclick=()=>{pendingDel=null;$("confirmModal").classList.remove("on");};
+$("cYes").onclick=async()=>{ const r=pendingDel; pendingDel=null; $("confirmModal").classList.remove("on"); if(!r) return;
+  try{ if(reactionsCol) await reactionsCol.doc(r.id).delete(); else { reactions=reactions.filter(x=>x.id!==r.id); render(); }
+    if(assets){ for(const id of (r.imgIds||[])){ try{ await assets.delete(id); }catch(e){} } } toast("已删除"); }catch(e){ handleWriteErr(e); } };
+
+/* ---------- storage: GitHub repo ---------- */
+let isAdmin=false, gh=null; // gh={owner,repo,branch,token}
+const LS="dramaDiaryGH";
+function lsGet(){ try{ return JSON.parse(localStorage.getItem(LS)||"null"); }catch(e){ return null; } }
+function lsSet(v){ try{ v?localStorage.setItem(LS,JSON.stringify(v)):localStorage.removeItem(LS); }catch(e){} }
+function guessRepo(){ const h=location.hostname, m=h.match(/^([^.]+)\.github\.io$/i); if(!m) return ""; const seg=location.pathname.split("/").filter(Boolean)[0]; return m[1]+"/"+(seg||h); }
+async function api(path,opt={}){
+  const r=await fetch(`https://api.github.com/repos/${gh.owner}/${gh.repo}${path}`,{...opt,headers:{"Authorization":"Bearer "+gh.token,"Accept":opt.accept||"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",...(opt.body?{"Content-Type":"application/json"}:{})}});
+  if(r.status===404&&opt.allow404) return null;
+  if(!r.ok){ const t=await r.text().catch(()=>""); const err=new Error("GitHub "+r.status+" "+t.slice(0,160)); err.status=r.status; throw err; }
+  return opt.raw?r.text():r.json();
+}
+const enc=p=>p.split("/").map(encodeURIComponent).join("/");
+async function getSha(p){ const j=await api(`/contents/${enc(p)}?ref=${encodeURIComponent(gh.branch)}`,{allow404:true}); return j&&j.sha||null; }
+async function putFile(p,b64,msg){ const sha=await getSha(p); return api(`/contents/${enc(p)}`,{method:"PUT",body:JSON.stringify({message:msg,content:b64,branch:gh.branch,...(sha?{sha}:{})})}); }
+async function delFile(p,msg){ const sha=await getSha(p); if(!sha) return; return api(`/contents/${enc(p)}`,{method:"DELETE",body:JSON.stringify({message:msg,sha,branch:gh.branch})}); }
+function utf8b64(str){ const bytes=new TextEncoder().encode(str); let bin=""; for(let i=0;i<bytes.length;i+=0x8000) bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000)); return btoa(bin); }
+const blobB64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(String(f.result).split(",")[1]);f.readAsDataURL(b);});
+let queue=Promise.resolve(), pending=0;
+function enqueue(fn){ pending++; showSaving(); const p=queue.then(fn); queue=p.catch(()=>{}).finally(()=>{pending--;showSaving();}); return p; }
+function showSaving(){ let el_=document.getElementById("saving"); if(!el_){ el_=document.createElement("div"); el_.id="saving"; el_.className="saving"; document.body.append(el_); } el_.textContent=pending?"正在保存到 GitHub…":""; el_.style.display=pending?"block":"none"; }
+const clean=r=>{ const o={...r}; delete o.imgData; return o; };
+function commitReactions(msg){ const body=JSON.stringify(reactions.slice().sort((a,b)=>a.createdAt-b.createdAt).map(clean),null,1); return enqueue(()=>putFile("data/reactions.json",utf8b64(body),msg)); }
+function ghErr(e){ console.error(e); banner(e&&e.status===401?"GitHub 令牌失效了，请重新登录。":"保存到 GitHub 失败："+(e&&e.message||"未知错误")+"。刷新前别关页面，可以再试一次。"); }
+const newId=()=>"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+reactionsCol={
+  async add(rec){ const r={id:newId(),...rec}; reactions.unshift(r); render(); await commitReactions("记一笔："+r.show+" "+epCode(r)).catch(e=>{ghErr(e);throw e;}); toast("已保存，约 1 分钟后朋友那边能看到"); },
+  doc(id){ return {
+    async update(patch){ const r=reactions.find(x=>x.id===id); if(!r) return; Object.assign(r,patch); for(const k in r) if(r[k]===null) delete r[k]; await commitReactions("编辑："+r.show+" "+epCode(r)).catch(e=>{ghErr(e);throw e;}); },
+    async delete(){ reactions=reactions.filter(x=>x.id!==id); render(); await commitReactions("删除一条记录").catch(e=>{ghErr(e);throw e;}); } }; } };
+metaRef={ set(body){ return enqueue(()=>putFile("data/meta.json",utf8b64(JSON.stringify(body,null,1)),"更新正在看")).catch(ghErr); } };
+assets={
+  async upload(blob){ const id=newId(); blobCache[id]=URL.createObjectURL(blob); const b64=await blobB64(blob); await enqueue(()=>putFile("images/"+id+".jpg",b64,"上传截图")).catch(e=>{ghErr(e);throw e;}); return {id}; },
+  async delete(id){ return enqueue(()=>delFile("images/"+id+".jpg","删除截图")).catch(ghErr); } };
+
+function normalize(arr){ return (Array.isArray(arr)?arr:[]).map(x=>({id:String(x.id||newId()),show:String(x.show||"未命名"),season:+x.season||1,episode:+x.episode||1,
+  ts:String(x.ts||""),mood:String(x.mood||""),level:+x.level||0,text:String(x.text||""),spoiler:!!x.spoiler,createdAt:+x.createdAt||0,
+  imgIds:Array.isArray(x.imgIds)?x.imgIds.filter(v=>typeof v==="string"&&/^[A-Za-z0-9_-]+$/.test(v)).slice(0,6):[]})).sort((a,b)=>b.createdAt-a.createdAt); }
+function applyMeta(d){ d=d||{}; meta={shows:Array.isArray(d.shows)?d.shows.filter(x=>typeof x==="string").slice(0,200):[],
+  done:Array.isArray(d.done)?d.done.filter(x=>typeof x==="string").slice(0,200):[],
+  current:{show:String(d.current?.show||""),season:+d.current?.season||1,episode:+d.current?.episode||1}}; }
+async function loadData(){
+  try{
+    let rs,mt;
+    if(isAdmin){ const raw={accept:"application/vnd.github.raw+json",raw:true,allow404:true};
+      rs=await api(`/contents/data/reactions.json?ref=${encodeURIComponent(gh.branch)}`,raw); mt=await api(`/contents/data/meta.json?ref=${encodeURIComponent(gh.branch)}`,raw);
+      rs=rs?JSON.parse(rs):[]; mt=mt?JSON.parse(mt):{}; }
+    else { const v="?v="+Date.now(); rs=await (await fetch("data/reactions.json"+v)).json(); mt=await fetch("data/meta.json"+v).then(r=>r.ok?r.json():{}).catch(()=>({})); }
+    reactions=normalize(rs); applyMeta(mt); banner("");
+  }catch(e){ console.error(e); banner("记录加载失败了，刷新一下试试。"); }
+  ready=true; render();
+}
+async function login(repoStr,token){
+  const m=String(repoStr).trim().match(/^([\w.-]+)\/([\w.-]+)$/); if(!m) throw new Error("仓库格式应为 用户名/仓库名");
+  gh={owner:m[1],repo:m[2],token:String(token).trim(),branch:"main"};
+  const info=await api("");
+  if(!info.permissions||!info.permissions.push) throw new Error("这个令牌没有这个仓库的写入权限");
+  gh.branch=info.default_branch||"main";
+}
+function setAdmin(v){ isAdmin=v; document.body.classList.toggle("admin",v); $("loginBtn").textContent=v?"退出管理":"管理"; $("footText").textContent=v?`管理中 · ${gh.owner}/${gh.repo}`:"追剧现场 · 我的追剧手账"; }
+$("loginBtn").onclick=()=>{ if(isAdmin){ lsSet(null); gh=null; setAdmin(false); toast("已退出"); loadData(); return; }
+  $("repoIn").value=(lsGet()||{}).repo||guessRepo(); $("tokenIn").value=""; $("loginErr").textContent=""; $("loginModal").classList.add("on"); setTimeout(()=>$("tokenIn").focus(),50); };
+$("loginCancel").onclick=()=>$("loginModal").classList.remove("on");
+$("loginOk").onclick=async()=>{ const b=$("loginOk"); b.disabled=true; $("loginErr").textContent="验证中…";
+  try{ await login($("repoIn").value,$("tokenIn").value); lsSet({repo:gh.owner+"/"+gh.repo,token:gh.token}); $("loginModal").classList.remove("on"); setAdmin(true); toast("登录成功，可以编辑了"); loadData(); }
+  catch(e){ gh=null; $("loginErr").textContent=e.status===401?"令牌无效或已过期":e.status===404?"找不到这个仓库（或令牌没有它的权限）":(e.message||"登录失败"); }
+  finally{ b.disabled=false; } };
+
+/* ---------- boot ---------- */
+render();
+(async()=>{
+  const saved=lsGet();
+  if(saved&&saved.token){ try{ await login(saved.repo,saved.token); setAdmin(true); }catch(e){ console.error(e); gh=null; banner("之前的 GitHub 登录已失效，点页面底部「管理」重新登录。"); } }
+  loadData();
+})();
+</script>
+</body>
+</html>
