@@ -1,1 +1,17 @@
-{"shows": ["Hacks", "怪奇物语", "蹦蹦地球游戏厅"], "done": ["Hacks", "怪奇物语"], "current": {"show": "蹦蹦地球游戏厅", "season": 3, "episode": 11}}
+{
+ "shows": [
+  "Hacks",
+  "怪奇物语",
+  "蹦蹦地球游戏厅"
+ ],
+ "done": [
+  "Hacks",
+  "怪奇物语",
+  "蹦蹦地球游戏厅"
+ ],
+ "current": {
+  "show": "蹦蹦地球游戏厅",
+  "season": 3,
+  "episode": 11
+ }
+}
